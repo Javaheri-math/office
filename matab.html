@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>مدیریت بیماران دکتر جواهری</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html {
+      font-size: 18px;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #e8edf4;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 12px;
+      margin: 0;
+      direction: rtl;
+      color: #1a2a3a;
+    }
+    .container {
+      max-width: 820px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 32px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10);
+      padding: 24px 24px 32px;
+      display: none;
+    }
+    .container.show {
+      display: block;
+    }
+    .login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(6px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+    .login-overlay.hidden {
+      display: none;
+    }
+    .login-box {
+      background: #ffffff;
+      border-radius: 36px;
+      padding: 44px 36px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    .login-box h2 {
+      font-size: 2rem;
+      color: #0a2a44;
+      margin-bottom: 8px;
+    }
+    .login-box p {
+      font-size: 1.2rem;
+      color: #4a6a8a;
+      margin-bottom: 24px;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 18px 20px;
+      border: 2px solid #c8d6e8;
+      border-radius: 60px;
+      font-size: 1.4rem;
+      text-align: center;
+      letter-spacing: 6px;
+      outline: none;
+      direction: ltr;
+      background: #f8faff;
+    }
+    .login-box input:focus {
+      border-color: #1a4a72;
+      box-shadow: 0 0 0 4px rgba(26, 74, 114, 0.12);
+    }
+    .login-box .btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 16px;
+      background: #1a4a72;
+      color: white;
+      border: none;
+      border-radius: 60px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .login-box .btn:active {
+      transform: scale(0.97);
+    }
+    .login-box .error {
+      color: #b13e3e;
+      font-size: 1rem;
+      margin-top: 14px;
+      display: none;
+      background: #ffe6e5;
+      padding: 10px;
+      border-radius: 30px;
+    }
+    .login-box .error.show {
+      display: block;
+    }
+    .app-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      border-bottom: 2px solid #dce4ee;
+      padding-bottom: 12px;
+      gap: 8px;
+    }
+    .app-header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #0a2a44;
+      margin: 0;
+      white-space: nowrap;
+    }
+    .doctor-badge {
+      background: #e2ebf5;
+      color: #0a2a44;
+      padding: 18px 24px;
+      border-radius: 60px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1.5px solid #b8cadd;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .doctor-badge:hover {
+      background: #d0ddec;
+      transform: scale(1.02);
+    }
+    .doctor-badge:active {
+      transform: scale(0.96);
+    }
+    .date-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      background: #e8f0fa;
+      padding: 12px 20px;
+      border-radius: 80px;
+      margin: 6px 0 20px 0;
+      border: 1.5px solid #c8d6e8;
+      flex-wrap: nowrap;
+    }
+    .date-box .nav-btn {
+      background: white;
+      border: 1.5px solid #b0c4da;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 1.8rem;
+      font-weight: 300;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #1a3a5a;
+      transition: 0.15s;
+      flex-shrink: 0;
+    }
+    .date-box .nav-btn:active {
+      background: #c8d8ec;
+      transform: scale(0.94);
+    }
+    .date-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 150px;
+      text-align: center;
+      padding: 0 6px;
+    }
+    .date-display {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #0a2a44;
+      line-height: 1.3;
+    }
+    .day-display {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #3a5a7a;
+    }
+    .search-area {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin: 16px 0 22px 0;
+    }
+    .search-area input {
+      width: 100%;
+      padding: 18px 22px;
+      border: 2px solid #c8d6e8;
+      border-radius: 60px;
+      font-size: 1.2rem;
+      background: #fafdff;
+      transition: 0.15s;
+      outline: none;
+      height: 66px;
+    }
+    .search-area input:focus {
+      border-color: #1a4a72;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(26, 74, 114, 0.08);
+    }
+    .search-area .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-start;
+      margin-top: 6px;
+    }
+    .btn {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 60px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s;
+      background: #e2ebf5;
+      color: #1a3a5a;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 56px;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+    .btn-primary {
+      background: #1a4a72;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #123a5a;
+    }
+    .btn-success {
+      background: #1d7a4b;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #15603a;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid #b0c4da;
+    }
+    .btn-outline:hover {
+      background: #e8f0fa;
+    }
+    #loading-container {
+      display: none;
+      text-align: center;
+      padding: 18px;
+      background: #e8f0fa;
+      border-radius: 60px;
+      margin: 10px 0 14px 0;
+      font-weight: 600;
+      color: #1a4a72;
+      font-size: 1.2rem;
+    }
+    #loading-container.show {
+      display: block;
+    }
+    .results {
+      margin-top: 20px;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      color: #5a7a94;
+      background: #f0f6fd;
+      border-radius: 28px;
+      border: 2px dashed #c0d0e0;
+      font-size: 1.3rem;
+    }
+    .empty-state .hint {
+      font-size: 1.1rem;
+      margin-top: 10px;
+      color: #7a9ab4;
+    }
+    .patient-item {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      background: #f4f9ff;
+      border-radius: 20px;
+      padding: 18px 22px;
+      margin-bottom: 14px;
+      border: 1.5px solid #d8e2ee;
+    }
+    .patient-item:hover {
+      background: #ecf3fd;
+      border-color: #b8cadd;
+    }
+    .patient-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 24px;
+      flex: 2 1 220px;
+    }
+    .patient-info .label {
+      font-weight: 700;
+      color: #2a4a6a;
+      margin-left: 4px;
+      font-size: 1.1rem;
+    }
+    .patient-info span {
+      font-size: 1.1rem;
+      color: #1a2e44;
+    }
+    .patient-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+      flex: 1 1 auto;
+      justify-content: flex-start;
+    }
+    .patient-actions .btn {
+      padding: 8px 18px;
+      font-size: 0.95rem;
+      min-height: 40px;
+      border-radius: 40px;
+    }
+    .btn-edit {
+      background: #e8c86a;
+      color: #3d2b0a;
+    }
+    .btn-edit:hover {
+      background: #dbb85a;
+    }
+    .btn-sms {
+      background: #3a9a66;
+      color: white;
+    }
+    .btn-sms:hover {
+      background: #2e8254;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: #ffffff;
+      max-width: 520px;
+      width: 100%;
+      border-radius: 36px;
+      padding: 32px 30px 36px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+      animation: fadeIn 0.2s ease;
+    }
+    .modal h2 {
+      font-size: 1.7rem;
+      color: #0a2a44;
+      margin-top: 0;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #dce4ee;
+      padding-bottom: 14px;
+    }
+    .modal label {
+      display: block;
+      font-weight: 700;
+      color: #1a3a5a;
+      margin: 18px 0 6px 0;
+      font-size: 1.1rem;
+    }
+    .modal input {
+      width: 100%;
+      padding: 16px 20px;
+      border: 2px solid #c8d6e8;
+      border-radius: 60px;
+      font-size: 1.15rem;
+      background: #fafdff;
+      outline: none;
+      transition: 0.15s;
+      height: 58px;
+    }
+    .modal input:focus {
+      border-color: #1a4a72;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(26, 74, 114, 0.08);
+    }
+    .modal input:disabled {
+      background: #eef2f8;
+      color: #4a5a6a;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 14px;
+      margin-top: 28px;
+    }
+    .error-msg {
+      color: #b13e3e;
+      background: #ffe6e5;
+      padding: 14px 18px;
+      border-radius: 40px;
+      margin-top: 14px;
+      display: none;
+      font-size: 1.05rem;
+    }
+    .error-msg.show {
+      display: block;
+    }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a2e44;
+      color: white;
+      padding: 18px 34px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1.15rem;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transition: opacity 0.25s;
+      pointer-events: none;
+      z-index: 2000;
+      text-align: center;
+      max-width: 90%;
+    }
+    .toast.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .refresh-modal .modal {
+      background: #eef5fc;
+      text-align: center;
+    }
+    .refresh-modal .modal h2 {
+      color: #0a2a44;
+      border-bottom: none;
+      padding-bottom: 0;
+      font-size: 1.9rem;
+    }
+    .refresh-modal .modal p {
+      font-size: 1.3rem;
+      color: #1a4a6a;
+    }
+    .refresh-modal .btn {
+      background: #1a4a72;
+      color: white;
+      font-size: 1.15rem;
+      padding: 12px 34px;
+    }
+    @media (max-width: 700px) {
+      html {
+        font-size: 16px;
+      }
+      body {
+        padding: 6px 8px;
+      }
+      .container {
+        padding: 14px 14px 22px;
+        border-radius: 24px;
+      }
+      .app-header h1 {
+        font-size: 1.4rem;
+      }
+      .doctor-badge {
+        font-size: 1.1rem !important;
+        padding: 12px 20px !important;
+      }
+      .date-box {
+        gap: 12px;
+        padding: 8px 14px;
+      }
+      .date-box .nav-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+      }
+      .date-content {
+        min-width: 110px;
+      }
+      .date-display {
+        font-size: 1.4rem;
+      }
+      .day-display {
+        font-size: 1rem;
+      }
+      .search-area input {
+        padding: 14px 18px;
+        font-size: 1.05rem;
+        height: 56px;
+      }
+      .btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+        min-height: 48px;
+      }
+      .patient-info .label,
+      .patient-info span {
+        font-size: 1rem;
+      }
+      .patient-actions .btn {
+        padding: 6px 14px;
+        font-size: 0.85rem;
+        min-height: 36px;
+      }
+      .modal {
+        padding: 22px 18px;
+      }
+      .modal h2 {
+        font-size: 1.4rem;
+      }
+      .modal input {
+        font-size: 1.05rem;
+        height: 50px;
+        padding: 12px 16px;
+      }
+      .modal label {
+        font-size: 1rem;
+      }
+      .empty-state {
+        font-size: 1.1rem;
+        padding: 32px 14px;
+      }
+      .toast {
+        font-size: 1rem;
+        padding: 14px 22px;
+      }
+      .login-box {
+        padding: 30px 22px;
+      }
+      .login-box h2 {
+        font-size: 1.6rem;
+      }
+    }
+    @media (max-width: 420px) {
+      .app-header h1 {
+        font-size: 1.1rem;
+      }
+      .doctor-badge {
+        font-size: 0.7rem;
+        padding: 6px 12px;
+      }
+      .date-display {
+        font-size: 1.1rem;
+      }
+      .day-display {
+        font-size: 0.85rem;
+      }
+      .date-content {
+        min-width: 80px;
+      }
+      .date-box .nav-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 1.2rem;
+      }
+      .search-area input {
+        font-size: 0.95rem;
+        height: 48px;
+        padding: 10px 14px;
+      }
+      .btn {
+        font-size: 0.85rem;
+        padding: 8px 14px;
+        min-height: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <h2>🔐 ورود</h2>
+      <p>لطفاً رمز عبور را وارد کنید</p>
+      <input type="password" id="passwordInput" placeholder="رمز عبور" maxlength="10" autofocus>
+      <button class="btn" onclick="checkPassword()">ورود</button>
+      <div class="error" id="loginError">رمز عبور نادرست است</div>
+    </div>
+  </div>
+
+  <div class="container" id="mainContainer">
+
+    <div class="app-header">
+      <h1>📋 مدیریت بیماران</h1>
+      <span class="doctor-badge" id="refreshTrigger">👨‍⚕️ دکتر رضا جواهری</span>
+    </div>
+
+    <div class="date-box">
+      <button class="nav-btn" id="prevDayBtn" title="روز قبل">‹</button>
+      <div class="date-content">
+        <span class="date-display" id="dateDisplay">بارگذاری...</span>
+        <span class="day-display" id="dayDisplay">-</span>
+      </div>
+      <button class="nav-btn" id="nextDayBtn" title="روز بعد">›</button>
+    </div>
+
+    <div class="search-area">
+      <input type="text" id="searchName" placeholder="جستجو بر اساس نام...">
+      <input type="text" id="searchCode" placeholder="جستجو بر اساس کد ملی...">
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="searchPatients()">🔍 جستجو</button>
+        <button class="btn btn-success" onclick="openAddModal()">➕ افزودن بیمار</button>
+      </div>
+    </div>
+
+    <div id="loading-container" class="show">⏳ در حال بارگذاری اطلاعات...</div>
+
+    <div id="results" class="results">
+      <div class="empty-state">
+        🔍 برای مشاهده بیماران، جستجو کنید
+        <div class="hint">نام یا کد ملی را وارد کرده و دکمه جستجو را بزنید</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2 id="modalTitle">افزودن بیمار</h2>
+      <form id="patientForm">
+        <label for="fName">نام کامل</label>
+        <input type="text" id="fName" required>
+        <label for="fNationalCode">کد ملی (۱۰ رقم)</label>
+        <input type="text" id="fNationalCode" required pattern="[0-9]{10}" maxlength="10">
+        <label for="fPhone">شماره تلفن</label>
+        <input type="text" id="fPhone" required>
+        <input type="hidden" id="fOriginalCode" value="">
+        <div id="formMessage" class="error-msg"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">لغو</button>
+          <button type="submit" class="btn btn-success" id="submitBtn">ذخیره</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay refresh-modal" id="refreshModal">
+    <div class="modal">
+      <h2>✅ بروزرسانی شد</h2>
+      <p>اطلاعات بیماران با موفقیت از سرور دریافت و به‌روز شد.</p>
+      <div class="modal-actions" style="justify-content:center;">
+        <button class="btn" onclick="closeRefreshModal()">باشه</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxjgdu3aIAa2LLOziMBMQ8C6tztpFTSXjpTBtXgNfMRZoJiB3tbab1sdf4c38LmC0Xf/exec';
+
+    function toEnglishDigits(str) {
+      if (!str) return '';
+      return str.replace(/[۰-۹]/g, function(d) {
+        return String.fromCharCode(d.charCodeAt(0) - 1728);
+      });
+    }
+
+    var CORRECT_PASSWORD = '1974';
+
+    function checkPassword() {
+      var input = document.getElementById('passwordInput');
+      var error = document.getElementById('loginError');
+      if (input.value === CORRECT_PASSWORD) {
+        document.getElementById('loginOverlay').classList.add('hidden');
+        document.getElementById('mainContainer').classList.add('show');
+        var stored = localStorage.getItem('patients');
+        if (stored) {
+          try {
+            allPatients = JSON.parse(stored);
+            showLoading(false);
+            document.getElementById('results').innerHTML = `
+              <div class="empty-state">🔍 برای مشاهده بیماران، جستجو کنید<div class="hint">نام یا کد ملی را وارد کرده و دکمه جستجو را بزنید</div></div>
+            `;
+            var n = document.getElementById('searchName').value.trim();
+            var c = document.getElementById('searchCode').value.trim();
+            if (n !== '' || c !== '') searchPatients();
+          } catch (e) {
+            loadFromServer(false);
+          }
+        } else {
+          loadFromServer(false);
+        }
+      } else {
+        error.classList.add('show');
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') checkPassword();
+    });
+
+    function gregorianToJalali(gy, gm, gd) {
+      var g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+      var jy = (gy <= 1600) ? 0 : 979;
+      gy -= (gy <= 1600) ? 621 : 1600;
+      var days = (365 * gy) + (parseInt((gy + 3) / 4)) - (parseInt((gy + 99) / 100)) + (parseInt((gy + 399) / 400)) - 80 + gd + g_d_m[gm - 1];
+      jy += 33 * (parseInt(days / 12053));
+      days %= 12053;
+      jy += 4 * (parseInt(days / 1461));
+      days %= 1461;
+      jy += parseInt((days - 1) / 365);
+      if (days > 365) days = (days - 1) % 365;
+      var jm = (days < 186) ? 1 + parseInt(days / 31) : 7 + parseInt((days - 186) / 30);
+      var jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+      return [jy, jm, jd];
+    }
+
+    function getPersianDayName(date) {
+      return ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'][date.getDay()];
+    }
+
+    function formatJalali(date) {
+      var j = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
+      return j[0] + '/' + String(j[1]).padStart(2, '0') + '/' + String(j[2]).padStart(2, '0');
+    }
+
+    var allPatients = [];
+    var filteredPatients = [];
+    var currentDate = new Date();
+    var todayShamsi = '';
+    var todayDayName = '';
+    var editingOriginalCode = '';
+
+    function showLoading(show) {
+      var el = document.getElementById('loading-container');
+      if (el) el.classList.toggle('show', show);
+    }
+
+    function loadFromServer(showRefreshModal) {
+      showRefreshModal = showRefreshModal || false;
+      showLoading(true);
+      fetch(WEB_APP_URL, { method: 'GET', mode: 'cors' })
+        .then(function(r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function(data) {
+          if (data.status === 'error') throw new Error(data.message);
+          if (!Array.isArray(data)) throw new Error('پاسخ معتبر نیست');
+          allPatients = data;
+          localStorage.setItem('patients', JSON.stringify(allPatients));
+          showLoading(false);
+          showToast('✅ اطلاعات بروزرسانی شد (' + allPatients.length + ' بیمار)');
+          var n = document.getElementById('searchName').value.trim();
+          var c = document.getElementById('searchCode').value.trim();
+          if (n !== '' || c !== '') {
+            searchPatients();
+          } else {
+            document.getElementById('results').innerHTML = `
+              <div class="empty-state">🔍 برای مشاهده بیماران، جستجو کنید<div class="hint">نام یا کد ملی را وارد کرده و دکمه جستجو را بزنید</div></div>
+            `;
+          }
+          if (showRefreshModal) {
+            document.getElementById('refreshModal').classList.add('active');
+          }
+        })
+        .catch(function(err) {
+          showLoading(false);
+          showToast('❌ خطا: ' + err.message);
+        });
+    }
+
+    function renderPatients(list) {
+      var container = document.getElementById('results');
+      if (!list || list.length === 0) {
+        container.innerHTML =
+          `<div class="empty-state">📭 هیچ بیماری یافت نشد.<div class="hint">لطفاً جستجوی خود را تغییر دهید</div></div>`;
+        return;
+      }
+      var html = '';
+      list.forEach(function(p) {
+        var phoneEng = toEnglishDigits(p.phone);
+        var smsText = 'با سلام و احترام\n' + p.name + ' عزیز، در روز ' + todayDayName + ' تاریخ ' + todayShamsi +
+          ' نوبت دکتر رضا جواهری (متخصص قلب و عروق) دارید.';
+        var smsLink = 'sms:' + phoneEng + '?body=' + encodeURIComponent(smsText);
+        html += `
+          <div class="patient-item">
+            <div class="patient-info">
+              <span><span class="label">نام:</span> <strong>${esc(p.name)}</strong></span>
+              <span><span class="label">کد ملی:</span> ${esc(p.nationalCode)}</span>
+              <span><span class="label">تلفن:</span> ${esc(p.phone)}</span>
+            </div>
+            <div class="patient-actions">
+              <button class="btn btn-edit" onclick="editPatient('${esc(p.nationalCode)}')">✎ ویرایش</button>
+              <a href="${smsLink}" class="btn btn-sms" target="_blank">✉ پیامک</a>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function esc(t) {
+      if (!t) return '';
+      return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function searchPatients() {
+      var n = document.getElementById('searchName').value.trim().toLowerCase();
+      var cRaw = document.getElementById('searchCode').value.trim();
+      var c = toEnglishDigits(cRaw);
+      if (n === '' && c === '') {
+        document.getElementById('results').innerHTML = `
+          <div class="empty-state">🔍 برای مشاهده بیماران، جستجو کنید<div class="hint">نام یا کد ملی را وارد کرده و دکمه جستجو را بزنید</div></div>
+        `;
+        return;
+      }
+      filteredPatients = allPatients.filter(function(p) {
+        var matchName = p.name.toLowerCase().includes(n);
+        var matchCode = toEnglishDigits(p.nationalCode).includes(c);
+        return matchName && matchCode;
+      });
+      renderPatients(filteredPatients);
+    }
+
+    function updateDateDisplay() {
+      var ds = formatJalali(currentDate);
+      var dayName = getPersianDayName(currentDate);
+      todayShamsi = ds;
+      todayDayName = dayName;
+      document.getElementById('dateDisplay').textContent = '📅 ' + ds;
+      document.getElementById('dayDisplay').textContent = dayName;
+    }
+
+    function changeDate(delta) {
+      var d = new Date(currentDate);
+      d.setDate(d.getDate() + delta);
+      currentDate = d;
+      updateDateDisplay();
+      if (filteredPatients && filteredPatients.length > 0) {
+        renderPatients(filteredPatients);
+      }
+    }
+
+    function openAddModal() {
+      document.getElementById('modalTitle').textContent = '➕ افزودن بیمار جدید';
+      document.getElementById('patientForm').reset();
+      document.getElementById('fOriginalCode').value = '';
+      document.getElementById('formMessage').className = 'error-msg';
+      document.getElementById('submitBtn').textContent = 'افزودن';
+      document.getElementById('submitBtn').disabled = false;
+      var oldStatus = document.querySelector('.status-msg');
+      if (oldStatus) oldStatus.remove();
+      document.getElementById('fNationalCode').disabled = false;
+      document.getElementById('modalOverlay').classList.add('active');
+      editingOriginalCode = '';
+    }
+
+    function editPatient(nationalCode) {
+      var p = allPatients.find(function(x) { return x.nationalCode === nationalCode; });
+      if (!p) {
+        showToast('⚠️ بیمار یافت نشد');
+        return;
+      }
+      document.getElementById('modalTitle').textContent = '✎ ویرایش بیمار';
+      document.getElementById('fName').value = p.name;
+      document.getElementById('fNationalCode').value = p.nationalCode;
+      document.getElementById('fNationalCode').disabled = true;
+      document.getElementById('fPhone').value = p.phone;
+      document.getElementById('fOriginalCode').value = p.nationalCode;
+      document.getElementById('formMessage').className = 'error-msg';
+      document.getElementById('submitBtn').textContent = 'ذخیره تغییرات';
+      document.getElementById('submitBtn').disabled = false;
+      var oldStatus = document.querySelector('.status-msg');
+      if (oldStatus) oldStatus.remove();
+      document.getElementById('modalOverlay').classList.add('active');
+      editingOriginalCode = p.nationalCode;
+    }
+
+    function closeModal() {
+      var oldStatus = document.querySelector('.status-msg');
+      if (oldStatus) oldStatus.remove();
+      document.getElementById('modalOverlay').classList.remove('active');
+      document.getElementById('formMessage').className = 'error-msg';
+      document.getElementById('fNationalCode').disabled = false;
+      document.getElementById('submitBtn').disabled = false;
+      document.getElementById('submitBtn').textContent = 'ذخیره';
+    }
+
+    function closeRefreshModal() {
+      document.getElementById('refreshModal').classList.remove('active');
+    }
+
+    document.getElementById('patientForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var name = document.getElementById('fName').value.trim();
+      var nationalCode = document.getElementById('fNationalCode').value.trim();
+      var phone = document.getElementById('fPhone').value.trim();
+      var originalCode = document.getElementById('fOriginalCode').value.trim();
+      var msg = document.getElementById('formMessage');
+
+      if (!name || !nationalCode || !phone) {
+        msg.textContent = '⚠️ همه فیلدها الزامی هستند.';
+        msg.className = 'error-msg show';
+        return;
+      }
+      if (!/^\d{10}$/.test(nationalCode)) {
+        msg.textContent = '⚠️ کد ملی باید ۱۰ رقم باشد.';
+        msg.className = 'error-msg show';
+        return;
+      }
+
+      var isEdit = (originalCode !== '');
+      var payload = {
+        action: isEdit ? 'update' : 'add',
+        name: name,
+        nationalCode: nationalCode,
+        phone: phone
+      };
+      if (isEdit) payload.originalNationalCode = originalCode;
+
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ در حال ارسال...';
+
+      var statusMsg = document.createElement('div');
+      statusMsg.textContent = '⏳ در حال ذخیره اطلاعات، لطفاً صبر کنید...';
+      statusMsg.style.cssText = 'color: #1a4a72; margin-top: 12px; font-size: 1rem; text-align: center;';
+      var actionsContainer = document.getElementById('modalOverlay').querySelector('.modal-actions');
+      var existingStatus = actionsContainer.querySelector('.status-msg');
+      if (existingStatus) existingStatus.remove();
+      statusMsg.className = 'status-msg';
+      actionsContainer.appendChild(statusMsg);
+
+      msg.className = 'error-msg';
+
+      fetch(WEB_APP_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          keepalive: true,
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload)
+        })
+        .then(function() {
+          showToast('✅ درخواست ارسال شد. در حال بروزرسانی...');
+          closeModal();
+          setTimeout(function() {
+            loadFromServer(false);
+          }, 800);
+        })
+        .catch(function(err) {
+          console.warn('❌ fetch با no-cors خطا داد، fallback با XHR:', err);
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', WEB_APP_URL, true);
+          xhr.setRequestHeader('Content-Type', 'text/plain');
+          xhr.timeout = 15000;
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+              if (xhr.status === 200) {
+                showToast('✅ درخواست ارسال شد. در حال بروزرسانی...');
+                closeModal();
+                setTimeout(function() {
+                  loadFromServer(false);
+                }, 800);
+              } else {
+                msg.textContent = '❌ خطا: کد ' + xhr.status;
+                msg.className = 'error-msg show';
+                btn.disabled = false;
+                btn.textContent = isEdit ? 'ذخیره تغییرات' : 'افزودن';
+                var statusMsg2 = document.querySelector('.status-msg');
+                if (statusMsg2) statusMsg2.remove();
+              }
+            }
+          };
+          xhr.send(JSON.stringify(payload));
+        });
+    });
+
+    function showToast(msg) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(function() {
+        t.classList.remove('show');
+      }, 3500);
+    }
+
+    window.onload = function() {
+      updateDateDisplay();
+
+      document.getElementById('prevDayBtn').addEventListener('click', function() {
+        changeDate(-1);
+      });
+      document.getElementById('nextDayBtn').addEventListener('click', function() {
+        changeDate(1);
+      });
+      document.getElementById('searchName').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') searchPatients();
+      });
+      document.getElementById('searchCode').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') searchPatients();
+      });
+      document.getElementById('modalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+      });
+      document.getElementById('refreshModal').addEventListener('click', function(e) {
+        if (e.target === this) closeRefreshModal();
+      });
+
+      document.getElementById('refreshTrigger').addEventListener('click', function() {
+        loadFromServer(true);
+      });
+    };
+  </script>
+</body>
+</html>
